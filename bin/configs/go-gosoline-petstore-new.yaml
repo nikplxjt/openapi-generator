@@ -1,0 +1,6 @@
+generatorName: go-gosoline
+outputDir: samples/server/petstore/go/gosoline
+inputSpec: modules/openapi-generator/src/test/resources/3_0/petstore.yaml
+templateDir: modules/openapi-generator/src/main/resources/go-gosoline
+additionalProperties:
+  hideGenerationTimestamp: "true"

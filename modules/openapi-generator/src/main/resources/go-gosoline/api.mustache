@@ -1,0 +1,51 @@
+{{>partial_header}}
+package {{packageName}}
+
+import (
+	"net/http"{{#apiInfo}}{{#apis}}{{#imports}}
+	"{{import}}"{{/imports}}{{/apis}}{{/apiInfo}}
+
+    "github.com/gin-gonic/gin"
+    "github.com/justtrackio/gosoline/pkg/apiserver/crud"
+    "github.com/justtrackio/gosoline/pkg/apiserver"
+)
+
+
+{{#apiInfo}}{{#apis}}
+// {{baseName}}Handler defines the api actions for the {{baseName}} service
+// This interface intended to stay up to date with the openapi yaml used to generate it,
+// while the service implementation can be ignored with the .openapi-generator-ignore file
+// and updated with the logic required for the API.
+type {{baseName}}Handler interface { {{#operations}}{{#operation}}
+    {{#vendorExtensions.x-goso-crud-is-read}}
+    crud.BaseHandler
+    {{/vendorExtensions.x-goso-crud-is-read}}
+    {{#vendorExtensions.x-goso-crud-is-list}}
+    crud.BaseListHandler
+    {{/vendorExtensions.x-goso-crud-is-list}}
+    {{#vendorExtensions.x-goso-crud-is-create}}
+    crud.BaseCreateHandler
+    {{/vendorExtensions.x-goso-crud-is-create}}
+    {{#vendorExtensions.x-goso-crud-is-update}}
+    crud.BaseUpdateHandler
+    {{/vendorExtensions.x-goso-crud-is-update}}
+    {{#vendorExtensions.x-goso-crud-is-delete}}
+    crud.BaseDeleteHandler
+    {{/vendorExtensions.x-goso-crud-is-delete}}
+    {{#vendorExtensions.x-goso-crud-is-none}}
+    {{#isDeprecated}}
+    // Deprecated
+    {{/isDeprecated}}
+    {{#isDeprecated}}
+    // Deprecated
+    {{/isDeprecated}}
+    {{#bodyParams}}{{#content}}
+    {{#application/json}}
+    apiserver.HandlerWithInput
+    {{/application/json}}
+    {{^application/json}}
+    {{operationId}}(http.ResponseWriter, *http.Request)
+    {{/application/json}}{{/content}}{{/bodyParams}}
+    {{/vendorExtensions.x-goso-crud-is-none}}
+    {{/operation}}{{/operations}}
+}{{/apis}}{{/apiInfo}}

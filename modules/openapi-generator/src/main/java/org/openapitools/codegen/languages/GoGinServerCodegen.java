@@ -112,7 +112,7 @@ public class GoGinServerCodegen extends AbstractGoCodegen {
                 // Added "error" as it's used so frequently that it may as well be a keyword
         );
 
-        cliOptions.add(new CliOption("apiPath", "Name of the folder that contains the Go source code")
+       cliOptions.add(new CliOption("apiPath", "Name of the folder that contains the Go source code")
                 .defaultValue(apiPath));
 
         CliOption optServerPort = new CliOption("serverPort", "The network port the generated server binds to");
@@ -245,5 +245,4 @@ public class GoGinServerCodegen extends AbstractGoCodegen {
     public String modelFileFolder() {
         return outputFolder + File.separator + apiPackage().replace('.', File.separatorChar);
     }
-
 }

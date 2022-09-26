@@ -1,0 +1,54 @@
+{{>partial_header}}
+package {{packageName}}
+
+import (
+    "context"
+
+    "github.com/justtrackio/gosoline/pkg/apiserver"
+    "github.com/justtrackio/gosoline/pkg/apiserver/crud"
+    "github.com/justtrackio/gosoline/pkg/cfg"
+    "github.com/justtrackio/gosoline/pkg/log"
+)
+
+func DefineRouter(ctx context.Context, config cfg.Config, logger log.Logger) (*apiserver.Definitions, error) {
+    logger = logger.WithContext(ctx)
+
+    d := &apiserver.Definitions{}
+{{#featureCORS}}
+    d.Use(apiserver.Cors(config))
+{{/featureCORS}}
+{{#apiInfo}}{{#apis}}
+    {{classVarName}}Handler, err := Provide{{baseName}}Handler(ctx, config, logger)
+    if err != nil {
+        return nil, err
+    }
+{{#operations}}{{#operation}}
+{{#vendorExtensions.x-goso-crud-is-read}}
+    d.GET("{{{path}}}", crud.NewReadHandler(logger, {{classVarName}}Handler))
+{{/vendorExtensions.x-goso-crud-is-read}}
+{{#vendorExtensions.x-goso-crud-is-list}}
+    d.POST("{{{path}}}", crud.NewListHandler(logger, {{classVarName}}Handler))
+{{/vendorExtensions.x-goso-crud-is-list}}
+{{#vendorExtensions.x-goso-crud-is-create}}
+    d.POST("{{{path}}}", crud.NewCreateHandler(logger, {{classVarName}}Handler))
+{{/vendorExtensions.x-goso-crud-is-create}}
+{{#vendorExtensions.x-goso-crud-is-update}}
+    d.PUT("{{{path}}}", crud.NewUpdateHandler(logger, {{classVarName}}Handler))
+{{/vendorExtensions.x-goso-crud-is-update}}
+{{#vendorExtensions.x-goso-crud-is-delete}}
+    d.DELETE("{{{path}}}", crud.NewDeleteHandler(logger, {{classVarName}}Handler))
+{{/vendorExtensions.x-goso-crud-is-delete}}
+{{#vendorExtensions.x-goso-crud-is-none}}
+    {{#bodyParams}}{{#content}}{{#application/json}}
+    d.{{#lambda.uppercase}}{{httpMethod}}{{/lambda.uppercase}}("{{{path}}}", apiserver.CreateJsonHandler({{classVarName}}Handler))
+    {{/application/json}}{{/content}}{{/bodyParams}}
+    {{#isDeprecated}}
+    // Deprecated
+    {{/isDeprecated}}
+    d.{{#lambda.uppercase}}{{httpMethod}}{{/lambda.uppercase}}("{{{path}}}", {{classVarName}}Handler.{{operationId}})
+{{/vendorExtensions.x-goso-crud-is-none}}
+
+{{/operation}}{{/operations}}{{/apis}}{{/apiInfo}}
+
+    return d, nil
+}

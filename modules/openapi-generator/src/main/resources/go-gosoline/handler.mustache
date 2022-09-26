@@ -1,0 +1,108 @@
+{{>partial_header}}
+package {{packageName}}
+
+import (
+	"context"
+    "fmt"
+	{{#imports}}
+    "{{import}}"{{/imports}}
+
+    "github.com/gin-gonic/gin"
+    "github.com/justtrackio/gosoline/pkg/appctx"
+    "github.com/justtrackio/gosoline/pkg/apiserver/crud"
+    "github.com/justtrackio/gosoline/pkg/cfg"
+    "github.com/justtrackio/gosoline/pkg/db-repo"
+    "github.com/justtrackio/gosoline/pkg/log"
+)
+
+// {{baseName}}Handler is a service that implements the logic for the {{classname}}DefaultHandlerr
+// This service should implement the business logic for every endpoint for the {{baseName}} API.
+// Include any external packages or services that will be required by this service.
+type {{classVarName}}Handler struct {
+    repository crud.Repository
+}
+
+type {{classVarName}}HandlerCtxKey string
+
+func Provide{{baseName}}Handler(ctx context.Context, config cfg.Config, logger log.Logger) ({{baseName}}Handler, error) {
+    return appctx.Provide(ctx, {{classVarName}}HandlerCtxKey("default"), func() ({{baseName}}Handler, error) {
+        return New{{baseName}}Handler(ctx, config, logger)
+    })
+}
+
+// New{{baseName}}Handler creates a default api service
+func New{{baseName}}Handler(ctx context.Context, config cfg.Config, logger log.Logger) (*{{classVarName}}Handler, error) {
+	return &{{classVarName}}Handler{}, nil
+}
+
+func (h {{classVarName}}Handler) GetModel() db_repo.ModelBased {
+    // TODO change to real type
+    return nil
+}
+
+func (h {{classVarName}}Handler) GetRepository() crud.Repository {
+    return h.repository
+}
+
+func (h {{classVarName}}Handler) TransformOutput(ctx context.Context, model db_repo.ModelBased, apiView string) (any, error) {
+    // TODO implement me
+    return nil, fmt.Errorf("TransformOutput not implemented")
+}
+{{#operations}}{{#operation}}
+{{#vendorExtensions.x-goso-crud-is-read}}
+
+{{/vendorExtensions.x-goso-crud-is-read}}
+{{#vendorExtensions.x-goso-crud-is-list}}
+func (h {{classVarName}}Handler) List(ctx context.Context, qb *db_repo.QueryBuilder, apiView string) (interface{}, error) {
+    // TODO implement me
+    return nil, fmt.Errorf("List not implemented")
+}
+{{/vendorExtensions.x-goso-crud-is-list}}
+{{#vendorExtensions.x-goso-crud-is-create}}
+func (h {{classVarName}}Handler) GetCreateInput() any {
+    return &{{returnType}}{}
+}
+
+func (h {{classVarName}}Handler) TransformCreate(ctx context.Context, inp any, model db_repo.ModelBased) error {
+    // TODO implement me
+    return fmt.Errorf("TransformCreate not implemented")
+}
+{{/vendorExtensions.x-goso-crud-is-create}}
+{{#vendorExtensions.x-goso-crud-is-update}}
+func (h {{classVarName}}Handler) GetUpdateInput() any {
+    return &{{returnType}}{}
+}
+
+func (h {{classVarName}}Handler) TransformCreate(ctx context.Context, inp any, model db_repo.ModelBased) error {
+    // TODO implement me
+    return fmt.Errorf("TransformUpdate not implemented")
+}
+{{/vendorExtensions.x-goso-crud-is-update}}
+
+{{#vendorExtensions.x-goso-crud-is-none}}
+
+{{#bodyParams}}{{#content}}
+{{#application/json}}
+func (h {{classVarName}}Handler) GetInput() any {
+    return &{{returnType}}{}
+}
+
+func (h {{classVarName}}Handler) Handle(ctx context.Context, request *apiserver.Request) (response *apiserver.Response, error error) {
+    _ = request.Body.(*{{returnType}})
+
+    return nil, fmt.Errorf("Handle not implemented")
+}
+{{/application/json}}
+{{^application/json}}
+// {{nickname}} - {{summary}}
+{{#isDeprecated}}
+    // Deprecated
+{{/isDeprecated}}
+func (h *{{classVarName}}Handler) {{nickname}}(c *gin.Context) {
+    // TODO - update {{nickname}} with the required logic for this service method.
+    // Add {{classFilename}}_service.go to the .openapi-generator-ignore to avoid overwriting this service implementation when updating open api generation.
+    return
+}{{/application/json}}
+{{/content}}{{/bodyParams}}
+{{/vendorExtensions.x-goso-crud-is-none}}
+{{/operation}}{{/operations}}

@@ -4,3 +4,5 @@ inputSpec: modules/openapi-generator/src/test/resources/3_0/petstore.yaml
 templateDir: modules/openapi-generator/src/main/resources/go-gosoline
 additionalProperties:
   hideGenerationTimestamp: "true"
+  packageName: "management-gateway"
+  addResponseHeaders: true
